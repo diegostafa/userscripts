@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        4chan sort comments
 // @namespace   github.com/diegostafa/userscripts
-// @match       https://boards.4chan(nel)?.org/*/thread/*
+// @match       https://boards.4chan.org/*/thread/*
+// @match       https://boards.4channel.org/*/thread/*
 // @grant       none
 // @version     1.0
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
