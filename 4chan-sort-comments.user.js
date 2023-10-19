@@ -6,13 +6,14 @@
 // @grant       none
 // @version     1.0
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
-// @description Buttons to sort 4chan comments (placed under the thread watcher)
+// @description buttons to sort 4chan comments (placed under the thread watcher)
 // @run-at      document-end
 // ==/UserScript==
 
 const sortComments = (sortingRule) => {
-  var thread = document.querySelector(".thread");
-  var comments = [...thread.children];
+  let thread = document.querySelector(".thread");
+  let comments = [...thread.children];
+
   comments.shift(); // ignore OP
   comments.sort(sortingRule);
   comments.forEach(comment => {
@@ -42,9 +43,9 @@ const byImagesFirst = (a, b) => {
   const fileA = a.querySelector(".fileThumb");
   const fileB = b.querySelector(".fileThumb");
 
-  if (fileB !== null && isImage(fileB.getAttribute("href")))
+  if (fileB && isImage(fileB.getAttribute("href")))
     return 1;
-  if (fileA !== null && isImage(fileA.getAttribute("href")))
+  if (fileA && isImage(fileA.getAttribute("href")))
     return -1;
   return 0;
 };
@@ -53,9 +54,9 @@ const byVideosFirst = (a, b) => {
   const fileA = a.querySelector(".fileThumb");
   const fileB = b.querySelector(".fileThumb");
 
-  if (fileB !== null && !isImage(fileB.getAttribute("href")))
+  if (fileB && !isImage(fileB.getAttribute("href")))
     return 1;
-  if (fileA !== null && !isImage(fileA.getAttribute("href")))
+  if (fileA && !isImage(fileA.getAttribute("href")))
     return -1;
   return 0;
 };
@@ -68,7 +69,7 @@ const byLinksFirst = (a, b) => {
 };
 
 const createSortButton = (text, action) => {
-  var button = document.createElement("div");
+  let button = document.createElement("div");
   button.addEventListener("click", action);
   button.innerHTML = text;
   button.style.backgroundColor = "#444444";
@@ -81,19 +82,21 @@ const createSortButton = (text, action) => {
 };
 
 const createBtnContainer = () => {
-  var div = document.createElement("div");
+  let div = document.createElement("div");
   div.style.display = "grid";
   div.style.gridTemplateColumns = "repeat(2, 1fr)";
   div.style.gridGap = "2px";
   return div;
 };
 
-var threadWatcher = document.getElementById("threadWatcher");
-var btnContainer = createBtnContainer();
+
+let threadWatcher = document.getElementById("threadWatcher");
+let btnContainer = createBtnContainer();
 
 btnContainer.appendChild(createSortButton("by replies", () => { sortComments(byRepliesDesc); }));
 btnContainer.appendChild(createSortButton("by time", () => { sortComments(byTimeDesc); }));
 btnContainer.appendChild(createSortButton("images first", () => { sortComments(byImagesFirst); }));
 btnContainer.appendChild(createSortButton("videos first", () => { sortComments(byVideosFirst); }));
 btnContainer.appendChild(createSortButton("links first", () => { sortComments(byLinksFirst); }));
+
 threadWatcher.appendChild(btnContainer);
