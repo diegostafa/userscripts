@@ -1,12 +1,11 @@
 // ==UserScript==
-// @name        4chan sort comments
+// @name        4chan-sort-comments
 // @namespace   github.com/diegostafa/userscripts
 // @match       https://boards.4chan.org/*/thread/*
 // @match       https://boards.4channel.org/*/thread/*
-// @grant       none
-// @version     1.0
+// @version     2
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
-// @description buttons to sort 4chan comments (placed under the thread watcher)
+// @description sort comments with differnt criterias (placed under the thread watcher)
 // @run-at      document-end
 // ==/UserScript==
 
@@ -68,6 +67,17 @@ const byLinksFirst = (a, b) => {
   return urlRegex.test(textB) - urlRegex.test(textA);
 };
 
+const byDeadLinkFirst = (a, b) => {
+  const deadlinkA = a.querySelector(".deadlink");
+  const deadlinkB = b.querySelector(".deadlink");
+
+  if (deadlinkB)
+    return 1;
+  if (deadlinkA)
+    return -1;
+  return 0;
+};
+
 const createSortButton = (text, action) => {
   let button = document.createElement("div");
   button.addEventListener("click", action);
@@ -89,14 +99,22 @@ const createBtnContainer = () => {
   return div;
 };
 
+const onThreadWatcherReady = () => {
+  let threadWatcher = document.getElementById("threadWatcher");
 
-let threadWatcher = document.getElementById("threadWatcher");
+  if (!threadWatcher) return;
+
+  threadWatcher.appendChild(btnContainer);
+  docObserver.disconnect();
+};
+
 let btnContainer = createBtnContainer();
-
 btnContainer.appendChild(createSortButton("by replies", () => { sortComments(byRepliesDesc); }));
 btnContainer.appendChild(createSortButton("by time", () => { sortComments(byTimeDesc); }));
 btnContainer.appendChild(createSortButton("images first", () => { sortComments(byImagesFirst); }));
 btnContainer.appendChild(createSortButton("videos first", () => { sortComments(byVideosFirst); }));
 btnContainer.appendChild(createSortButton("links first", () => { sortComments(byLinksFirst); }));
+btnContainer.appendChild(createSortButton("deadlinks first", () => { sortComments(byDeadLinkFirst); }));
 
-threadWatcher.appendChild(btnContainer);
+const docObserver = new MutationObserver(onThreadWatcherReady);
+docObserver.observe(document, { attributes: false, childList: true, subtree: true });

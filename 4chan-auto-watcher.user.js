@@ -3,9 +3,9 @@
 // @namespace   github.com/diegostafa/userscripts
 // @match       https://boards.4chan.org/*/catalog
 // @match       https://boards.4channel.org/*/catalog
-// @version     1.0
+// @version     2
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
-// @description a script to automatically watch 4chan threads matching a pattern
+// @description automatically watch threads matching a pattern
 // @run-at      document-end
 // ==/UserScript==
 
@@ -51,9 +51,9 @@ const buildUi = () => {
   let btnContainer = document.createElement("div");
 
   btnContainer.style.display = "grid";
-  btnContainer.style.gridTemplateColumns = "repeat(2, 1fr)";
+  btnContainer.style.gridTemplateColumns = "100%";
   btnContainer.style.gridGap = "2px";
-  btnContainer.appendChild(createConfigButton());
+  //btnContainer.appendChild(createConfigButton());
   btnContainer.appendChild(createAutowatchButton());
 
   threadWatcher.appendChild(btnContainer);

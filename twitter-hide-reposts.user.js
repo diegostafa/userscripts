@@ -3,9 +3,9 @@
 // @namespace   github.com/diegostafa/userscripts
 // @match       https://twitter.com/home
 // @grant       none
-// @version     1.0
+// @version     2
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
-// @description hide twitter reposts in the home feed
+// @description hide reposts in the home feed
 // @run-at      document-end
 // ==/UserScript==
 
