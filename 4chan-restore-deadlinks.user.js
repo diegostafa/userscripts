@@ -3,9 +3,9 @@
 // @namespace   github.com/diegostafa/userscripts
 // @match       https://boards.4chan.org/*/thread/*
 // @match       https://boards.4channel.org/*/thread/*
-// @version     2
+// @version     3
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
-// @description restore and point deadlinks to their respective archives
+// @description restore and point deadlinks and removed files to their respective archives
 // @run-at      document-end
 // ==/UserScript==
 
@@ -23,28 +23,49 @@ const boardId = urlParts[0];
 const threadId = urlParts[2];
 const archive = archives[boardId];
 
-const addLinkToArchive = (deadlink) => {
-  let quoteId = deadlink.textContent.split(">>").pop();
-
-  let archiveLink = `https://${archive}/${boardId}/thread/${threadId}/#q${quoteId}`;
-  if (archive === "warosu.org") archiveLink = `https://${archive}/${boardId}/thread/${quoteId}`;
-
-  let deadLinkAnchor = document.createElement('a');
-  deadLinkAnchor.textContent = deadlink.textContent + " (DEAD)";
-  deadLinkAnchor.href = archiveLink;
-  deadLinkAnchor.classList.add("quotelink");
-  deadLinkAnchor.setAttribute("target", "_blank");
-
-  deadlink.textContent = "";
-  deadlink.appendChild(deadLinkAnchor);
+const getArchiveLink = (quoteId) => {
+  if (archive === "warosu.org")
+    return `https://${archive}/${boardId}/thread/${quoteId}`;
+  else
+    return `https://${archive}/${boardId}/thread/${threadId}/#q${quoteId}`;
 };
 
+const createLinkToArchive = (text, archiveLink) => {
+  let link = document.createElement('a');
+
+  link.textContent = text;
+  link.href = archiveLink;
+  link.classList.add("quotelink");
+  link.setAttribute("target", "_blank");
+
+  return link;
+};
+
+const restoreDeadlink = (deadlink) => {
+  let quoteId = deadlink.textContent.split(">>").pop();
+  let text = deadlink.textContent + " (DEAD)";
+
+  deadlink.textContent = "";
+  deadlink.appendChild(createLinkToArchive(text, getArchiveLink(quoteId)));
+};
+
+const restoreDeadfile = (deadfile) => {
+  let quoteId = deadfile.parentNode.parentNode.parentNode.id.split("p").pop();
+  let parent = deadfile.parentNode;
+  parent.removeChild(deadfile);
+  parent.classList.add("deadlink");
+  parent.appendChild(createLinkToArchive("FILE REMOVED", getArchiveLink(quoteId)));
+};
+
+
 const main = () => {
-  let deadlinks = document.querySelectorAll(".thread .deadlink");
+  Array
+    .from(document.querySelectorAll(".thread .deadlink"))
+    .forEach(restoreDeadlink);
 
   Array
-    .from(deadlinks)
-    .forEach(addLinkToArchive);
+    .from(document.querySelectorAll(".fileDeletedRes"))
+    .forEach(restoreDeadfile);
 };
 
 main();
