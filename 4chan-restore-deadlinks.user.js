@@ -32,19 +32,16 @@ const getArchiveLink = (quoteId) => {
 
 const createLinkToArchive = (text, archiveLink) => {
     let link = document.createElement('a');
-
     link.textContent = text;
     link.href = archiveLink;
     link.classList.add("quotelink");
     link.setAttribute("target", "_blank");
-
     return link;
 };
 
 const restoreDeadlink = (deadlink) => {
     let quoteId = deadlink.textContent.split(">>").pop();
     let text = deadlink.textContent + " (DEAD)";
-
     deadlink.textContent = "";
     deadlink.appendChild(createLinkToArchive(text, getArchiveLink(quoteId)));
 };

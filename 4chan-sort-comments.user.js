@@ -3,7 +3,7 @@
 // @namespace   github.com/diegostafa/userscripts
 // @match       https://boards.4chan.org/*/thread/*
 // @match       https://boards.4channel.org/*/thread/*
-// @version     4
+// @version     5
 // @author      Diego <dstafa.dev@gmail.com> (github.com/diegostafa)
 // @description sort comments with differnt criterias (placed under the thread watcher)
 // @run-at      document-end
@@ -14,6 +14,8 @@
 const isVideoRegex = /.*(webm|gif)$/;
 const isUrlRegex = /.*:(\/\/|\?).*/gi;
 const isOpReplyRegex = /.* \(OP\)$/;
+
+// --- logic
 
 const sortComments = (sortingRule) => {
   let thread = document.querySelector(".thread");
@@ -59,8 +61,8 @@ const byLinksFirst = (a, b) => {
 };
 
 const byDeadLinkFirst = (a, b) => {
-  const deadlinkA = a.querySelector(".deadlink");
-  const deadlinkB = b.querySelector(".deadlink");
+  const deadlinkA = a.querySelector(".deadlink") ? 1 : 0;
+  const deadlinkB = b.querySelector(".deadlink") ? 1 : 0;
   return deadlinkB - deadlinkA;
 };
 
@@ -69,6 +71,14 @@ const byOpRepliesFirst = (a, b) => {
   const quoteB = b.querySelector(".postMessage .quotelink")?.innerText || "";
   return isOpReplyRegex.test(quoteB) - isOpReplyRegex.test(quoteA);
 };
+
+const byYousFirst = (a, b) => {
+  const youA = a.querySelector(".ql-tracked") ? 1 : 0;
+  const youB = b.querySelector(".ql-tracked") ? 1 : 0;
+  return youB - youA;
+};
+
+// --- ui
 
 const createSortButton = (text, sortMethod) => {
   let button = document.createElement("div");
@@ -99,6 +109,8 @@ const setupUiWhenTWReady = () => {
   }
 };
 
+// --- main
+
 let btnContainer = createBtnContainer();
 btnContainer.appendChild(createSortButton("by replies", byRepliesDesc));
 btnContainer.appendChild(createSortButton("by time", byTimeDesc));
@@ -109,6 +121,7 @@ btnContainer.appendChild(createSortButton("deadlinks first", byDeadLinkFirst));
 btnContainer.appendChild(
   createSortButton("op replies first", byOpRepliesFirst),
 );
+btnContainer.appendChild(createSortButton("(you)s first", byYousFirst));
 
 let docObserver = new MutationObserver(setupUiWhenTWReady);
 docObserver.observe(document, {

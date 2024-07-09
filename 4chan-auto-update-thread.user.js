@@ -13,49 +13,49 @@ let thread = document.querySelector(".thread");
 let replies = thread.children.length;
 
 let observer = new MutationObserver(() => {
-  let newReplies = thread.children.length;
-  if (replies == newReplies) return;
-  replies = newReplies;
+    let newReplies = thread.children.length;
+    if (replies == newReplies) return;
+    replies = newReplies;
 
-  document
-    .querySelector(".thread > :last-child")
-    .scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+        .querySelector(".thread > :last-child")
+        .scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 const startObserving = () =>
-  observer.observe(thread, {
-    attributes: false,
-    childList: true,
-    subtree: true,
-  });
+    observer.observe(thread, {
+        attributes: false,
+        childList: true,
+        subtree: true,
+    });
 const stopObserving = () => observer.disconnect();
 const toggleObserver = (cb) => () =>
-  cb.checked ? startObserving() : stopObserving();
+    cb.checked ? startObserving() : stopObserving();
 
 const buildUi = () => {
-  let cb = document.createElement("input");
-  cb.type = "checkbox";
-  cb.id = "autoUpdateThread";
-  cb.name = "autoUpdateThread";
-  cb.addEventListener("change", toggleObserver(cb));
+    let cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.id = "autoUpdateThread";
+    cb.name = "autoUpdateThread";
+    cb.addEventListener("change", toggleObserver(cb));
 
-  let lb = document.createElement("label");
-  lb.htmlFor = "autoUpdateThread";
-  lb.appendChild(document.createTextNode("auto update thread"));
+    let lb = document.createElement("label");
+    lb.htmlFor = "autoUpdateThread";
+    lb.appendChild(document.createTextNode("auto update thread"));
 
-  let botNavLinks = document.querySelector(".navLinks.navLinksBot");
-  botNavLinks.appendChild(cb);
-  botNavLinks.appendChild(lb);
+    let botNavLinks = document.querySelector(".navLinks.navLinksBot");
+    botNavLinks.appendChild(cb);
+    botNavLinks.appendChild(lb);
 
-  return cb;
+    return cb;
 };
 
 const autoUpdate = () => {
-  let cb = buildUi();
-  let updateBtn = document.querySelector('a[data-cmd="update"]');
-  setInterval(() => {
-    if (cb.checked) updateBtn.click();
-  }, 5000);
+    let cb = buildUi();
+    let updateBtn = document.querySelector('a[data-cmd="update"]');
+    setInterval(() => {
+        if (cb.checked) updateBtn.click();
+    }, 5000);
 };
 
 autoUpdate();

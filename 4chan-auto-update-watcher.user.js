@@ -9,23 +9,45 @@
 // @run-at      document-end
 // ==/UserScript==
 
-const autoUpdateWatcher = () => {
-    let refreshIcon = document.querySelector("#twPrune");
-    let clickEvent = document.createEvent("MouseEvents");
-    clickEvent.initEvent("mouseup", true, true);
-    refreshIcon.dispatchEvent(clickEvent);
+const title = document.title;
 
-    setInterval(() => {
-        refreshIcon.dispatchEvent(clickEvent);
-    }, 5000);
+const updateDocumentTitle = () => {
+  let threads = document.querySelectorAll("#watchList .hasNewReplies");
+
+  if (threads.length === 0) {
+    document.title = title;
+    return;
+  }
+
+  let newReplies = Array
+    .from(threads)
+    .map((item) => item.innerHTML.split(" ")[0].slice(1, -1))
+    .reduce((prev, curr) => Number(prev) + Number(curr));
+
+  document.title = "(" + newReplies + ")" + " " + title;
+};
+
+const autoUpdateWatcher = () => {
+  let refreshIcon = document.querySelector("#twPrune");
+  let clickEvent = document.createEvent("MouseEvents");
+  clickEvent.initEvent("mouseup", true, true);
+  refreshIcon.dispatchEvent(clickEvent);
+
+  setInterval(() => {
+    refreshIcon.dispatchEvent(clickEvent);
+    updateDocumentTitle();
+  }, 5000);
 };
 
 const onThreadWatcherReady = () => {
-    if (!document.getElementById("threadWatcher")) return;
-
-    docObserver.disconnect();
-    autoUpdateWatcher();
+  if (!document.getElementById("threadWatcher")) return;
+  docObserver.disconnect();
+  autoUpdateWatcher();
 };
 
 const docObserver = new MutationObserver(onThreadWatcherReady);
-docObserver.observe(document, { attributes: false, childList: true, subtree: true });
+docObserver.observe(document, {
+  attributes: false,
+  childList: true,
+  subtree: true,
+});

@@ -61,12 +61,11 @@ const buildUi = () => {
 
 const isThreadMatching = (filters) => (thread) => {
     const teaser = thread.querySelector('.teaser');
-
     if (!teaser) return false;
 
-    return filters.reduce(
-        (acc, [board, filter]) =>
-            acc = acc || (filter.test(teaser.textContent) && (board === "" || currentBoard === board)), false);
+    for (const [board, filter] of filters)
+        if (filter.test(teaser.textContent) && (board === "" || currentBoard === board))
+            return true;
 };
 
 const autoWatch = () => {

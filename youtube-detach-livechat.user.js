@@ -9,62 +9,61 @@
 
 let prevMousePos = { x: 0, y: 0 };
 let dragging = false;
-let pauseObserving = false;
 
 const attachedStyle = {
-  position: "static",
-  zIndex: "0",
+    position: "static",
+    zIndex: "0",
 };
 const detachedStyle = {
-  position: "fixed",
-  zIndex: "10000",
+    position: "fixed",
+    zIndex: "10000",
 };
 
 const dragStart = (event) => {
-  dragging = true;
-  prevMousePos.x = event.clientX;
-  prevMousePos.y = event.clientY;
+    dragging = true;
+    prevMousePos.x = event.clientX;
+    prevMousePos.y = event.clientY;
 };
 
 const dragEnd = () => dragging = false;
 
 const drag = (chat) => (event) => {
-  if (!dragging) return;
+    if (!dragging) return;
 
-  let top = chat.getBoundingClientRect().top;
-  let left = chat.getBoundingClientRect().left;
-  let dx = event.clientX - prevMousePos.x;
-  let dy = event.clientY - prevMousePos.y;
+    let top = chat.getBoundingClientRect().top;
+    let left = chat.getBoundingClientRect().left;
+    let dx = event.clientX - prevMousePos.x;
+    let dy = event.clientY - prevMousePos.y;
 
-  chat.style.left = (dx + left) + "px";
-  chat.style.top = (dy + top) + "px";
+    chat.style.left = (dx + left) + "px";
+    chat.style.top = (dy + top) + "px";
 };
 
 const toggleLiveChat = (toggle, chat) => () =>
-  toggle.checked
-    ? Object.assign(chat.style, detachedStyle)
-    : Object.assign(chat.style, attachedStyle);
+    toggle.checked
+        ? Object.assign(chat.style, detachedStyle)
+        : Object.assign(chat.style, attachedStyle);
 
 const setToggle = () => {
-  let frame = document.querySelector("#chatframe")?.contentDocument;
-  if (!frame) return;
+    let frame = document.querySelector("#chatframe")?.contentDocument;
+    if (!frame) return;
 
-  if (frame.querySelector("#detachLiveChat")) return;
+    if (frame.querySelector("#detachLiveChat")) return;
 
-  let header = frame.querySelector("yt-live-chat-header-renderer");
-  if (!header) return;
+    let header = frame.querySelector("yt-live-chat-header-renderer");
+    if (!header) return;
 
-  let chat = document.querySelector("#chat-container");
-  let toggle = document.createElement("input");
-  toggle.type = "checkbox";
-  toggle.checked = chat.style.position == "fixed";
-  toggle.id = "detachLiveChat";
-  toggle.addEventListener("change", toggleLiveChat(toggle, chat));
+    let chat = document.querySelector("#chat-container");
+    let toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.checked = chat.style.position == "fixed";
+    toggle.id = "detachLiveChat";
+    toggle.addEventListener("change", toggleLiveChat(toggle, chat));
 
-  header.prepend(toggle);
-  header.addEventListener("mousedown", dragStart);
-  header.addEventListener("mouseup", dragEnd);
-  header.addEventListener("mousemove", drag(chat));
+    header.prepend(toggle);
+    header.addEventListener("mousedown", dragStart);
+    header.addEventListener("mouseup", dragEnd);
+    header.addEventListener("mousemove", drag(chat));
 };
 
 setInterval(setToggle, 2000);
