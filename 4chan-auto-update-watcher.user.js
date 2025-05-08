@@ -12,42 +12,46 @@
 const title = document.title;
 
 const updateDocumentTitle = () => {
-  let threads = document.querySelectorAll("#watchList .hasNewReplies");
+    let newReplies = document.querySelectorAll("#watchList .hasNewReplies");
+    let newYous = document.querySelectorAll("#watchList .hasYouReplies");
 
-  if (threads.length === 0) {
-    document.title = title;
-    return;
-  }
+    if (newReplies.length === 0) {
+        document.title = title;
+        return;
+    }
 
-  let newReplies = Array
-    .from(threads)
-    .map((item) => item.innerHTML.split(" ")[0].slice(1, -1))
-    .reduce((prev, curr) => Number(prev) + Number(curr));
+    let youMark = "";
+    if (newYous.length !== 0) youMark = "*";
 
-  document.title = "(" + newReplies + ")" + " " + title;
+    let newRepliesCount = Array
+        .from(newReplies)
+        .map((item) => item.innerHTML.split(" ")[0].slice(1, -1))
+        .reduce((prev, curr) => Number(prev) + Number(curr));
+
+    document.title = youMark + "(" + newRepliesCount + ")" + " " + title;
 };
 
 const autoUpdateWatcher = () => {
-  let refreshIcon = document.querySelector("#twPrune");
-  let clickEvent = document.createEvent("MouseEvents");
-  clickEvent.initEvent("mouseup", true, true);
-  refreshIcon.dispatchEvent(clickEvent);
-
-  setInterval(() => {
+    let refreshIcon = document.querySelector("#twPrune");
+    let clickEvent = document.createEvent("MouseEvents");
+    clickEvent.initEvent("mouseup", true, true);
     refreshIcon.dispatchEvent(clickEvent);
-    updateDocumentTitle();
-  }, 5000);
+
+    setInterval(() => {
+        refreshIcon.dispatchEvent(clickEvent);
+        updateDocumentTitle();
+    }, 5000);
 };
 
 const onThreadWatcherReady = () => {
-  if (!document.getElementById("threadWatcher")) return;
-  docObserver.disconnect();
-  autoUpdateWatcher();
+    if (!document.getElementById("threadWatcher")) return;
+    docObserver.disconnect();
+    autoUpdateWatcher();
 };
 
 const docObserver = new MutationObserver(onThreadWatcherReady);
 docObserver.observe(document, {
-  attributes: false,
-  childList: true,
-  subtree: true,
+    attributes: false,
+    childList: true,
+    subtree: true,
 });

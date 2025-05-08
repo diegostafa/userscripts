@@ -9,107 +9,100 @@
 // @run-at      document-end
 // ==/UserScript==
 
-// --- regex
-
-const isVideoRegex = /.*(webm|gif)$/;
+const isVideoRegex = /.*(webm|gif|mp4)$/;
 const isUrlRegex = /.*:(\/\/|\?).*/gi;
 const isOpReplyRegex = /.* \(OP\)$/;
 
-// --- logic
-
 const sortComments = (sortingRule) => {
-  let thread = document.querySelector(".thread");
-  let comments = [...thread.children];
+    let thread = document.querySelector(".thread");
+    let comments = [...thread.children];
 
-  comments.shift(); // ignore OP
-  comments.sort(sortingRule);
-  comments.forEach((comment) => {
-    thread.appendChild(comment);
-  });
+    comments.shift(); // ignore OP
+    comments.sort(sortingRule);
+    comments.forEach((comment) => {
+        thread.appendChild(comment);
+    });
 };
 
 const byRepliesDesc = (a, b) => {
-  const repliesA = a.querySelectorAll(".backlink > span").length;
-  const repliesB = b.querySelectorAll(".backlink > span").length;
-  return repliesB - repliesA;
+    const repliesA = a.querySelectorAll(".backlink > span").length;
+    const repliesB = b.querySelectorAll(".backlink > span").length;
+    return repliesB - repliesA;
 };
 
 const byTimeDesc = (a, b) => {
-  const timeA = a.querySelector(".dateTime").getAttribute("data-utc");
-  const timeB = b.querySelector(".dateTime").getAttribute("data-utc");
-  return timeA - timeB;
+    const timeA = a.querySelector(".dateTime").getAttribute("data-utc");
+    const timeB = b.querySelector(".dateTime").getAttribute("data-utc");
+    return timeA - timeB;
 };
 
 const byImagesFirst = (a, b) => {
-  const fileA = a.querySelector(".fileThumb");
-  const fileB = b.querySelector(".fileThumb");
-  return (fileB && !isVideoRegex.test(fileB)) -
-    (fileA && !isVideoRegex.test(fileA));
+    const fileA = a.querySelector(".fileThumb");
+    const fileB = b.querySelector(".fileThumb");
+    return (fileB && !isVideoRegex.test(fileB)) -
+        (fileA && !isVideoRegex.test(fileA));
 };
 
 const byVideosFirst = (a, b) => {
-  const fileA = a.querySelector(".fileThumb");
-  const fileB = b.querySelector(".fileThumb");
-  return (fileB && isVideoRegex.test(fileB)) -
-    (fileA && isVideoRegex.test(fileA));
+    const fileA = a.querySelector(".fileThumb");
+    const fileB = b.querySelector(".fileThumb");
+    return (fileB && isVideoRegex.test(fileB)) -
+        (fileA && isVideoRegex.test(fileA));
 };
 
 const byLinksFirst = (a, b) => {
-  const textA = a.querySelector(".postMessage").innerText;
-  const textB = b.querySelector(".postMessage").innerText;
-  return isUrlRegex.test(textB) - isUrlRegex.test(textA);
+    const textA = a.querySelector(".postMessage").innerText;
+    const textB = b.querySelector(".postMessage").innerText;
+    return isUrlRegex.test(textB) - isUrlRegex.test(textA);
 };
 
 const byDeadLinkFirst = (a, b) => {
-  const deadlinkA = a.querySelector(".deadlink") ? 1 : 0;
-  const deadlinkB = b.querySelector(".deadlink") ? 1 : 0;
-  return deadlinkB - deadlinkA;
+    const deadlinkA = a.querySelector(".deadlink") ? 1 : 0;
+    const deadlinkB = b.querySelector(".deadlink") ? 1 : 0;
+    return deadlinkB - deadlinkA;
 };
 
 const byOpRepliesFirst = (a, b) => {
-  const quoteA = a.querySelector(".postMessage .quotelink")?.innerText || "";
-  const quoteB = b.querySelector(".postMessage .quotelink")?.innerText || "";
-  return isOpReplyRegex.test(quoteB) - isOpReplyRegex.test(quoteA);
+    const quoteA = a.querySelector(".postMessage .quotelink")?.innerText || "";
+    const quoteB = b.querySelector(".postMessage .quotelink")?.innerText || "";
+    return isOpReplyRegex.test(quoteB) - isOpReplyRegex.test(quoteA);
 };
 
 const byYousFirst = (a, b) => {
-  const youA = a.querySelector(".ql-tracked") ? 1 : 0;
-  const youB = b.querySelector(".ql-tracked") ? 1 : 0;
-  return youB - youA;
+    const youA = a.querySelector(".ql-tracked") ? 1 : 0;
+    const youB = b.querySelector(".ql-tracked") ? 1 : 0;
+    return youB - youA;
 };
 
-// --- ui
-
 const createSortButton = (text, sortMethod) => {
-  let button = document.createElement("div");
-  button.addEventListener("click", () => sortComments(sortMethod));
-  button.innerHTML = text;
-  button.style.backgroundColor = "#444444";
-  button.style.color = "white";
-  button.style.textAlign = "center";
-  button.style.border = "none";
-  button.style.padding = "2px";
-  button.style.cursor = "pointer";
-  return button;
+    let button = document.createElement("div");
+    button.addEventListener("click", () => sortComments(sortMethod));
+    button.innerHTML = text;
+    button.style.backgroundColor = "#444444";
+    button.style.color = "white";
+    button.style.textAlign = "center";
+    button.style.border = "none";
+    button.style.padding = "2px";
+    button.style.cursor = "pointer";
+    return button;
 };
 
 const createBtnContainer = () => {
-  let div = document.createElement("div");
-  div.style.display = "grid";
-  div.style.gridTemplateColumns = "auto auto auto";
-  div.style.gridGap = "2px";
-  return div;
+    let div = document.createElement("div");
+    div.style.display = "grid";
+    div.style.gridTemplateColumns = "auto auto auto";
+    div.style.gridGap = "2px";
+    return div;
 };
 
 const setupUiWhenTWReady = () => {
-  let threadWatcher = document.getElementById("threadWatcher");
-  if (threadWatcher) {
-    threadWatcher.appendChild(btnContainer);
-    docObserver.disconnect();
-  }
+    let threadWatcher = document.getElementById("threadWatcher");
+    if (threadWatcher) {
+        threadWatcher.appendChild(btnContainer);
+        docObserver.disconnect();
+    }
 };
 
-// --- main
 
 let btnContainer = createBtnContainer();
 btnContainer.appendChild(createSortButton("by replies", byRepliesDesc));
@@ -119,13 +112,13 @@ btnContainer.appendChild(createSortButton("videos first", byVideosFirst));
 btnContainer.appendChild(createSortButton("links first", byLinksFirst));
 btnContainer.appendChild(createSortButton("deadlinks first", byDeadLinkFirst));
 btnContainer.appendChild(
-  createSortButton("op replies first", byOpRepliesFirst),
+    createSortButton("op replies first", byOpRepliesFirst),
 );
 btnContainer.appendChild(createSortButton("(you)s first", byYousFirst));
 
 let docObserver = new MutationObserver(setupUiWhenTWReady);
 docObserver.observe(document, {
-  attributes: false,
-  childList: true,
-  subtree: true,
+    attributes: false,
+    childList: true,
+    subtree: true,
 });
